@@ -48,12 +48,12 @@ cc1101:
   bandwidth: 200.0
   frequency: 868.4
 
-# Optional: CC1101 sensor for RSSI monitoring
-sensor:
-  - platform: cc1101
-    cc1101_id: transciver
-    rssi: false
-    internal: true
+# CC1101 sensor removed - was internal and not used
+# sensor:
+#   - platform: cc1101
+#     cc1101_id: transciver
+#     rssi: false
+#     internal: true
 
 remote_transmitter:
   - id: transmitter

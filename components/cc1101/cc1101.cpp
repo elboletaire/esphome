@@ -16,7 +16,8 @@ void CC1101Component::setup() {
   pinMode(this->gdo0_pin_, INPUT);
 
   // Initialize the CC1101 module
-  ELECHOUSE_cc1101.addSpiPin(this->get_clk_pin(), this->get_miso_pin(), this->get_mosi_pin(), this->get_cs_pin(), this->module_number_);
+  // Use the SPI pins from the global SPI configuration
+  ELECHOUSE_cc1101.addSpiPin(18, 19, 23, 15, this->module_number_);
   ELECHOUSE_cc1101.setModul(this->module_number_);
   ELECHOUSE_cc1101.Init();
   ELECHOUSE_cc1101.setRxBW(this->bandwidth_);
@@ -28,7 +29,7 @@ void CC1101Component::setup() {
 
 void CC1101Component::dump_config() {
   ESP_LOGCONFIG(TAG, "CC1101:");
-  LOG_PIN("  GDO0 Pin: ", this->gdo0_pin_);
+  ESP_LOGCONFIG(TAG, "  GDO0 Pin: %d", this->gdo0_pin_);
   ESP_LOGCONFIG(TAG, "  Bandwidth: %.1f kHz", this->bandwidth_);
   ESP_LOGCONFIG(TAG, "  Frequency: %.1f MHz", this->frequency_);
   ESP_LOGCONFIG(TAG, "  Module Number: %.0f", this->module_number_);
@@ -65,15 +66,6 @@ int CC1101Component::get_rssi() {
   return ELECHOUSE_cc1101.getRssi();
 }
 
-void CC1101Sensor::update() {
-  if (this->rssi_enabled_) {
-    int rssi = this->parent_->get_rssi();
-    if (rssi != this->last_rssi_) {
-      this->publish_state(rssi);
-      this->last_rssi_ = rssi;
-    }
-  }
-}
 
 // Global function to get CC1101 component instance
 CC1101Component *get_cc1101(CC1101Component *component) {

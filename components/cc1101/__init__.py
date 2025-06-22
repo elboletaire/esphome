@@ -4,7 +4,7 @@ from esphome.components import spi
 from esphome.const import CONF_ID
 
 DEPENDENCIES = ["spi"]
-CODEOWNERS = ["@dbuezas"]
+CODEOWNERS = ["@elboletaire"]
 
 cc1101_ns = cg.esphome_ns.namespace("cc1101")
 CC1101Component = cc1101_ns.class_("CC1101Component", cg.Component, spi.SPIDevice)

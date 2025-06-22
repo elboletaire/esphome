@@ -22,7 +22,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_CC1101_ID): cv.use_id(CC1101Component),
         cv.Optional(CONF_RSSI, default=False): cv.boolean,
     }
-).extend(cv.COMPONENT_SCHEMA).extend(sensor.SENSOR_SCHEMA)
+).extend(cv.polling_component_schema("100ms")).extend(sensor.SENSOR_SCHEMA)
 
 
 async def to_code(config):

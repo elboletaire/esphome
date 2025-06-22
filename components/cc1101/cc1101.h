@@ -2,7 +2,6 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/spi/spi.h"
-#include "esphome/components/sensor/sensor.h"
 #include <ELECHOUSE_CC1101_SRC_DRV.h>
 
 namespace esphome {
@@ -33,19 +32,6 @@ class CC1101Component : public Component, public spi::SPIDevice<spi::BIT_ORDER_M
   static int module_count_;
 };
 
-class CC1101Sensor : public sensor::Sensor, public PollingComponent {
- public:
-  CC1101Sensor() : PollingComponent(100) {}
-  void set_cc1101_parent(CC1101Component *parent) { this->parent_ = parent; }
-  void set_rssi_enabled(bool enabled) { this->rssi_enabled_ = enabled; }
-  void update() override;
-  float get_setup_priority() const override { return setup_priority::DATA; }
-
- protected:
-  CC1101Component *parent_;
-  bool rssi_enabled_{false};
-  int last_rssi_{0};
-};
 
 // Global function to get CC1101 component instance
 CC1101Component *get_cc1101(CC1101Component *component);
