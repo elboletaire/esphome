@@ -36,17 +36,35 @@ void CC1101Component::dump_config() {
 }
 
 void CC1101Component::begin_transmission() {
+  ESP_LOGD(TAG, "Beginning transmission...");
   ELECHOUSE_cc1101.setModul(this->module_number_);
   ELECHOUSE_cc1101.SetTx();
   pinMode(this->gdo0_pin_, OUTPUT);
+#ifdef USE_ESP32
+  // Critical: Reinitialize remote transmitter for each transmission
+  if (this->remote_transmitter_ != nullptr) {
+    this->remote_transmitter_->setup();
+  }
+#endif
+  ESP_LOGD(TAG, "Transmission setup complete");
 }
 
 void CC1101Component::end_transmission() {
+  ESP_LOGD(TAG, "Ending transmission...");
   digitalWrite(this->gdo0_pin_, 0);
   pinMode(this->gdo0_pin_, INPUT);
   ELECHOUSE_cc1101.setModul(this->module_number_);
   ELECHOUSE_cc1101.SetRx();
   ELECHOUSE_cc1101.SetRx();  // yes, twice as in original
+
+  // Additional reset to ensure clean state for next transmission
+  ELECHOUSE_cc1101.setModul(this->module_number_);
+  ELECHOUSE_cc1101.Init();
+  ELECHOUSE_cc1101.setRxBW(this->bandwidth_);
+  ELECHOUSE_cc1101.setMHZ(this->frequency_);
+  ELECHOUSE_cc1101.SetRx();
+
+  ESP_LOGD(TAG, "Transmission ended, module reset to RX");
 }
 
 void CC1101Component::set_bandwidth_runtime(float bandwidth) {

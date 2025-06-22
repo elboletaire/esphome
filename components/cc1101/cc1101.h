@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/spi/spi.h"
+#include "esphome/components/remote_transmitter/remote_transmitter.h"
 #include <ELECHOUSE_CC1101_SRC_DRV.h>
 
 namespace esphome {
@@ -16,6 +17,7 @@ class CC1101Component : public Component, public spi::SPIDevice<spi::BIT_ORDER_M
   void set_gdo0_pin(int pin) { this->gdo0_pin_ = pin; }
   void set_bandwidth(float bandwidth) { this->bandwidth_ = bandwidth; }
   void set_frequency(float frequency) { this->frequency_ = frequency; }
+  void set_remote_transmitter(remote_transmitter::RemoteTransmitterComponent *transmitter) { this->remote_transmitter_ = transmitter; }
 
   void begin_transmission();
   void end_transmission();
@@ -30,6 +32,7 @@ class CC1101Component : public Component, public spi::SPIDevice<spi::BIT_ORDER_M
   float frequency_;
   float module_number_;
   static int module_count_;
+  remote_transmitter::RemoteTransmitterComponent *remote_transmitter_{nullptr};
 };
 
 

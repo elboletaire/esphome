@@ -47,6 +47,7 @@ cc1101:
   gdo0_pin: 21
   bandwidth: 200.0
   frequency: 868.4
+  remote_transmitter_id: transmitter
 
 # CC1101 sensor removed - was internal and not used
 # sensor:
