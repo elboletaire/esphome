@@ -1,5 +1,3 @@
-# thanks to https://github.com/dbuezas/esphome-cc1101
-
 esphome:
   name: cc1101-cale-rf
   friendly_name: Control cale RF
