@@ -1,0 +1,7 @@
+esphome:
+  name: placeholder
+
+esp32:
+  board: esp32dev
+
+logger:

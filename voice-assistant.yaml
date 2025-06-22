@@ -1,0 +1,149 @@
+esphome:
+  name: assistent-de-veu
+  platform: ESP32
+  board: esp32dev
+
+logger:
+
+wifi:
+  ssid: !secret wifi_name
+  password: !secret wifi_pass
+  power_save_mode: none
+
+captive_portal:
+
+api:
+  encryption:
+    key: !secret key
+
+ota:
+  platform: esphome
+
+web_server:
+  port: 80
+
+i2s_audio:
+  - id: i2s_in
+    i2s_lrclk_pin: GPIO26   #WS / LRC
+    i2s_bclk_pin: GPIO25    #SCK /BCLK
+
+microphone:
+  - platform: i2s_audio
+    adc_type: external
+    pdm: false
+    id: mic_i2s
+    channel: right
+    bits_per_sample: 32bit
+    i2s_audio_id: i2s_in
+    i2s_din_pin: GPIO33    #SD
+
+speaker:
+  - platform: i2s_audio
+    id: my_speaker
+    dac_type: external
+    i2s_dout_pin: GPIO27   #DIN
+    i2s_mode: primary
+    i2s_audio_id: i2s_in
+
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: led_active
+
+voice_assistant:
+  microphone: mic_i2s
+  id: va
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  volume_multiplier: 4.0
+  use_wake_word: false
+  speaker: my_speaker
+  on_wake_word_detected:
+    - output.turn_on: led_active
+  on_listening:
+    - output.turn_on: led_active
+  on_stt_vad_end:
+    - output.turn_off: led_active
+  on_error:
+   - if:
+        condition:
+          switch.is_on: use_wake_word
+        then:
+          - switch.turn_off: use_wake_word
+          - switch.turn_on: use_wake_word
+  on_client_connected:
+    - if:
+        condition:
+          switch.is_on: use_wake_word
+        then:
+          - voice_assistant.start_continuous:
+  on_client_disconnected:
+    - if:
+        condition:
+          switch.is_on: use_wake_word
+        then:
+          - voice_assistant.stop:
+
+number:
+  - platform: template
+    name: Mic Gain
+    id: mic_gain
+    min_value: 0
+    max_value: 31
+    step: 1
+    restore_value: true
+    mode: slider
+    entity_category: config
+    set_action:
+      - lambda: id(va).set_auto_gain(x);
+  - platform: template
+    name: Speaker Volume
+    id: speaker_volume
+    min_value: 0.1
+    max_value: 3
+    step: 0.1
+    restore_value: true
+    mode: slider
+    entity_category: config
+    set_action:
+      - lambda: id(va).set_volume_multiplier(x);
+
+binary_sensor:
+  - platform: status
+    name: API Connection
+    id: api_connection
+    filters:
+      - delayed_on: 1s
+    on_press:
+      - if:
+          condition:
+            switch.is_on: use_wake_word
+          then:
+            - voice_assistant.start_continuous:
+    on_release:
+      - if:
+          condition:
+            switch.is_on: use_wake_word
+          then:
+            - voice_assistant.stop:
+
+
+switch:
+  - platform: template
+    name: Use wake word
+    id: use_wake_word
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    on_turn_on:
+      - lambda: id(va).set_use_wake_word(true);
+      - if:
+          condition:
+            not:
+              - voice_assistant.is_running
+          then:
+            - voice_assistant.start_continuous
+
+    on_turn_off:
+      - voice_assistant.stop
+      - lambda: id(va).set_use_wake_word(false);
