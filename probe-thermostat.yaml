@@ -7,7 +7,7 @@ esp32:
   board: esp32-c3-devkitm-1
   variant: esp32c3
   framework:
-    type: arduino
+    type: esp-idf
 
 wifi:
   ssid: !secret wifi_name
@@ -20,6 +20,11 @@ logger:
 api:
   encryption:
     key: !secret key
+  on_client_connected:
+    then:
+      - logger.log: "Connected to HA"
+      - lambda: |-
+          id(ha_connected) = true;
 
 ota:
   platform: esphome
@@ -29,12 +34,54 @@ one_wire:
   - platform: gpio
     pin: GPIO4
 
+globals:
+  - id: ha_connected
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+# interval:
+#   - interval: 10s
+#     then:
+#       - if:
+#           condition:
+#             lambda: 'return id(ha_connected);'
+#           then:
+#             - logger.log: Going to sleep after successful HA connection
+#             - deep_sleep.enter: tsleep
+#           else:
+#             - logger.log: Waiting for HA connection before sleeping device...
+
 sensor:
   - platform: dallas_temp
     name: "DS18B20 Temperature"
     resolution: 12
-
+  - platform: adc
+    pin: GPIO0
+    name: "Battery Level"
+    attenuation: 11db # important per mesurar fins a >2V
+    update_interval: 60s
+    filters:
+      - multiply: 2.0  # Per compensar el divisor de tensió 1:2
+      - calibrate_linear:
+          - 3.0 -> 0.0
+          - 3.3 -> 5.0
+          - 3.5 -> 15.0
+          - 3.7 -> 40.0
+          - 3.85 -> 60.0
+          - 4.0 -> 85.0
+          - 4.2 -> 100.0
+      - lambda: |-
+          if (x > 100.0) return 100.0;
+          else return round(x);
+      - sliding_window_moving_average:
+          window_size: 10
+          send_every: 10
+    unit_of_measurement: "%"
+    icon: "mdi:battery"
+    id: battery_percent
 # deep sleep to reduce power consumption
-deep_sleep:
-  run_duration: 15s
-  sleep_duration: 10min
+# deep_sleep:
+#   id: tsleep
+#   run_duration: 90s
+#   sleep_duration: 10min
