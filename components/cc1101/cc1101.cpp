@@ -13,33 +13,46 @@ void CC1101Component::setup() {
 
   this->module_number_ = CC1101Component::module_count_++;
 
-  pinMode(this->gdo0_pin_, INPUT);
+  this->gdo0_pin_->setup();
+  this->gdo0_pin_->pin_mode(gpio::FLAG_INPUT);
 
   // Initialize the CC1101 module
-  // Use the SPI pins from the global SPI configuration
-  ELECHOUSE_cc1101.addSpiPin(18, 19, 23, 15, this->module_number_);
+  // Use the SPI pins from the component configuration
+  ELECHOUSE_cc1101.addSpiPin(
+    this->clk_pin_->get_pin(),
+    this->miso_pin_->get_pin(),
+    this->mosi_pin_->get_pin(),
+    this->cs_pin_->get_pin(),
+    this->module_number_
+  );
   ELECHOUSE_cc1101.setModul(this->module_number_);
   ELECHOUSE_cc1101.Init();
   ELECHOUSE_cc1101.setRxBW(this->bandwidth_);
   ELECHOUSE_cc1101.setMHZ(this->frequency_);
   ELECHOUSE_cc1101.SetRx();
 
+  this->initialized_ = true;
   ESP_LOGCONFIG(TAG, "CC1101 setup complete");
 }
 
 void CC1101Component::dump_config() {
   ESP_LOGCONFIG(TAG, "CC1101:");
-  ESP_LOGCONFIG(TAG, "  GDO0 Pin: %d", this->gdo0_pin_);
+  ESP_LOGCONFIG(TAG, "  GDO0 Pin: GPIO%d", this->gdo0_pin_->get_pin());
   ESP_LOGCONFIG(TAG, "  Bandwidth: %.1f kHz", this->bandwidth_);
   ESP_LOGCONFIG(TAG, "  Frequency: %.1f MHz", this->frequency_);
   ESP_LOGCONFIG(TAG, "  Module Number: %.0f", this->module_number_);
 }
 
 void CC1101Component::begin_transmission() {
+  if (!this->initialized_) {
+    ESP_LOGW(TAG, "CC1101 not initialized yet, skipping transmission");
+    return;
+  }
+
   ESP_LOGD(TAG, "Beginning transmission...");
   ELECHOUSE_cc1101.setModul(this->module_number_);
   ELECHOUSE_cc1101.SetTx();
-  pinMode(this->gdo0_pin_, OUTPUT);
+  this->gdo0_pin_->pin_mode(gpio::FLAG_OUTPUT);
 #ifdef USE_ESP32
   // Critical: Reinitialize remote transmitter for each transmission
   if (this->remote_transmitter_ != nullptr) {
@@ -51,8 +64,8 @@ void CC1101Component::begin_transmission() {
 
 void CC1101Component::end_transmission() {
   ESP_LOGD(TAG, "Ending transmission...");
-  digitalWrite(this->gdo0_pin_, 0);
-  pinMode(this->gdo0_pin_, INPUT);
+  this->gdo0_pin_->digital_write(false);
+  this->gdo0_pin_->pin_mode(gpio::FLAG_INPUT);
   ELECHOUSE_cc1101.setModul(this->module_number_);
   ELECHOUSE_cc1101.SetRx();
   ELECHOUSE_cc1101.SetRx();  // yes, twice as in original

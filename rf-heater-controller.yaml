@@ -4,18 +4,14 @@ esphome:
 
 esp32:
   board: esp32dev
+  framework:
+    type: arduino
 
 # External components configuration
 external_components:
   - source:
       type: local
       path: components
-
-# SPI configuration for CC1101
-spi:
-  clk_pin: 18
-  miso_pin: 19
-  mosi_pin: 23
 
 wifi:
   ssid: !secret wifi_name
@@ -42,8 +38,13 @@ web_server:
 # CC1101 component configuration
 cc1101:
   id: transciver
+  clk_pin: 18
+  miso_pin: 19
+  mosi_pin: 23
   cs_pin: 15
-  gdo0_pin: 21
+  gdo0_pin:
+    number: 21
+    allow_other_uses: true
   bandwidth: 200.0
   frequency: 868.4
   remote_transmitter_id: transmitter
