@@ -5,3 +5,13 @@
 /secrets.yaml
 *.ai
 __pycache__
+
+# macOS
+.DS_Store
+
+# KiCad local files
+.history/
+*.lck
+*.kicad_prl
+fp-info-cache
+_autosave-*
