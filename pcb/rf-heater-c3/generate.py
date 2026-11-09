@@ -119,6 +119,8 @@ C2_PADS = ((36.0, 22.5), (38.5, 22.5))
 
 MOUNT_HOLES = ((25.3, 27.0), (40.7, 27.0))
 BOARD_TEXT = [(f"{PROJECT} v1", 12.0, 25.6), (BOARD_DATE, 12.0, 27.4)]
+# PCBWay prints its order number where this marker is (B.SilkS, mirrored).
+PCBWAY_MARK = ("WayWayWay", 11.6, 26.5, 0.8)
 
 POWER_NETS = ("3V3", "GND")
 UNROUTED_NETS = ("GND",)  # poured instead of routed
@@ -165,6 +167,7 @@ def add_text(parent, text, x, y, layer=pn.F_SilkS, size=SILK_TEXT):
     item = pn.PCB_TEXT(parent)
     item.SetText(text)
     item.SetLayer(layer)
+    item.SetMirrored(layer == pn.B_SilkS)
     item.SetPosition(point(x, y))
     item.SetTextSize(V(mm(size), mm(size)))
     item.SetTextThickness(mm(SILK_THICKNESS))
@@ -379,6 +382,8 @@ def build_board():
 
     for text, x, y in BOARD_TEXT:
         add_text(board, text, x, y)
+    mark, mx, my, msize = PCBWAY_MARK
+    add_text(board, mark, mx, my, layer=pn.B_SilkS, size=msize)
 
     # Keepouts. Rule areas go in before the zone fill so the pours respect them.
     x0, y0, x1, y1 = C3_ANT_KEEPOUT
