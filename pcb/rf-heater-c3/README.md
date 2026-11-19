@@ -47,7 +47,7 @@ Cal Freerouting a `~/.local/share/freerouting/freerouting-2.5.0.jar` i Java (per
 - Soldar primer C2 i C1, després U1 i finalment U2.
 - U2: el punt de pin 1 és a la part inferior de la vora de capçalera. Els pads són SMD de 2 × 1 mm que sobresurten de la vora del mòdul: soldar-los amb ferro i una mica de flux.
 - Pad 10 (ANT) sense net: només serveix de punt de soldadura per a l'antena. Al voltant hi ha una zona prohibida de 3 mm (sense pistes, vies ni farcit de GND), amb dos corredors per als pads 9 i 11.
-- Les posicions dels pads d'antena (`ANT_PAD_OFFSETS`, mesurades des de la cantonada del pin 1) són les del mòdul real que s'ha mesurat. Les mides del mòdul (`MOD_H = 17.4`) i els pads 9 i 11 (1.2 mm) també venen d'aquesta mesura.
+- v1.1 corregeix les posicions dels pads d'antena (9, 10, 11): la v1 estava 1.25 mm massa amunt i no encaixava amb el mòdul real (`ANT_PAD_OFFSETS`, des de la cantonada del pin 1). Les mides del mòdul (`MOD_H = 17.4`) i els pads 9 i 11 (1.2 mm) també venen d'aquesta mesura.
 - **El `.kicad_pcb` té edicions manuals** (serigrafia, p. ex. el text «elboletaire» i la data, i algunes posicions). Regenerar amb `generate.py` les sobreescriuria: aleshores cal tornar-les a aplicar a mà.
 
 ## Notes

@@ -42,7 +42,7 @@ FREEROUTING_PASSES = 50
 # Board and design rules (mm)
 BOARD_W = 43.7
 BOARD_H = 30.0
-BOARD_DATE = "2026-11-09"
+BOARD_DATE = "2026-11-19"
 COPPER_EDGE_CLEARANCE = 0.3
 CLEARANCE = 0.2
 SIGNAL_TRACK = 0.3
@@ -94,7 +94,7 @@ HEADER_PITCH = 2.00
 PIN1_FROM_CORNER = 1.6
 PAD_LONG = 2.0  # perpendicular to the module edge (straddles it)
 PAD_SHORT = 1.0
-ANT_PAD_OFFSETS = (12.22, 9.68, 7.15)  # pads 9, 10, 11: measured from the pin 1 corner
+ANT_PAD_OFFSETS = (10.97, 8.43, 5.90)  # pads 9, 10, 11 from pin 1 corner; v1 (12.22, 9.68, 7.15) was 1.25 mm off
 ANT_PADS = (9, 10, 11)
 ANT_PAD_NO_NET = 10
 ANT_KEEPOUT_MARGIN = 3.0
@@ -110,15 +110,15 @@ HEADER_NETS = {1: "3V3", 2: "GND", 3: "MOSI", 4: "SCK", 5: "MISO", 7: "GDO0", 8:
 ANT_NETS = {9: "GND", 11: "GND"}
 MODULE_OUTLINE = (1.2, 0.0, MOD_W - 1.2, MOD_H)  # frame coordinates, inset from pads
 PIN1_DOT = (2.6, MOD_H - PIN1_FROM_CORNER)
-MODULE_TEXT = ("CC1101", 9.45, 8.5)
-ANT_TEXT = ("ANT →", 15.2, 4.0)
+MODULE_TEXT = ("CC1101", 9.45, 5.8)
+ANT_TEXT = ("ANT →", 15.2, MOD_BOTTOM - ANT_PAD_OFFSETS[ANT_PADS.index(ANT_PAD_NO_NET)] - MOD_Y)
 
 # Passives (through-hole), pad 1 target positions; pad 1 is + on C1
 C1_PADS = ((31.0, 22.5), (31.0, 24.5))  # C1 is rotated -90 so GND sits below its 3V3 pad
 C2_PADS = ((36.0, 22.5), (38.5, 22.5))
 
 MOUNT_HOLES = ((25.3, 27.0), (40.7, 27.0))
-BOARD_TEXT = [(f"{PROJECT} v1", 12.0, 25.6), (BOARD_DATE, 12.0, 27.4)]
+BOARD_TEXT = [(f"{PROJECT} v1.1", 12.0, 25.6), (BOARD_DATE, 12.0, 27.4)]
 # PCBWay prints its order number where this marker is (B.SilkS, mirrored).
 PCBWAY_MARK = ("WayWayWay", 11.6, 26.5, 0.8)
 
